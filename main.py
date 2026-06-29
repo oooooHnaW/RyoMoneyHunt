@@ -1,0 +1,166 @@
+from player import player
+from npc import mob, friendly
+from entities import coin
+import os
+from time import sleep, perf_counter
+import keyboard
+from random import randint
+
+# Constants
+
+coordPlaceHolder = [0,0]
+
+W = "x" # Wall
+B = " " # Blank space
+RESETTEXT = "\033[0m\033"
+
+WIDTH = 19
+HEIGHT = 19
+
+# Map will be 3D array 20x20?
+
+# Map will be customisable
+gameMap = [[W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,B,W],
+       [W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W]]
+
+# Initialisation of characters/entities
+
+Ryo = player("Ryo", 0, coordPlaceHolder)
+
+mobs = [mob("Nijika", -Ryo.money, "WHY DO YOU KEEP BORROWING MONEY FROM BOCCHI???", coordPlaceHolder, "\033[1m\033 \033[33mN\033"+RESETTEXT), # Ryo.money is a placeholder that means take all of Ryo's money away :)
+        mob("Hiroi", -10, "heh heh, can I please borrow 10 dollars?", coordPlaceHolder, "\033[1m\033 \033[38;2;153;0;153mH\033"+RESETTEXT)]
+
+friendlies = [friendly("Bocchi", 10, "Ummmm, I guess it's fine if I borrow you 10 dollars?", coordPlaceHolder, "\033[1m\033 \033[38;2;255;0;255mB\033"+RESETTEXT),
+              friendly("Kita", 20, "OF COURSE!!! I'LL DO ANYTHING FOR RYO-SENPAI!!!", coordPlaceHolder, "\033[1m\033 \033[31mK\033"+RESETTEXT)]
+# Coordinates of entities are currently occupied by coordinate placeholders, will implement random selection of coordinates later on.
+
+entities = [coin(".", 1, 60)] # Time in seconds
+
+# System/Game procedures
+
+def clearscreen():
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+def ms_sleep(ms):
+    sleep(ms/1000)
+
+def placeInMap(map, item):
+    Coord = item.coord
+    map[Coord[1]][Coord[0]] = item
+
+def printMap(map, coins):
+    for row in map:
+        for element in row:
+            if type(element) == str:
+                print(element, end="")
+            else:
+                print(element.symbol)
+        print()
+    
+    print(f"Money:${coins}")
+
+def randomGeneration(map):
+    y = 0
+    x = 0
+    y = randint(0, len(map)-1)
+    x = randint(0, len(map[0])-1)
+    return [x, y]
+
+def resetMap(map, item):
+    coords = item.coord
+    for row in range(len(map)-1):
+        for element in range(len(map[0])-1):
+            if element != coords[0] and row != coords[1] and map[row][element] != W:
+                map[row][element] = B
+
+# Main game
+game = True
+
+start = perf_counter()
+
+def random(): # Test function
+    coords = randomGeneration(gameMap)
+    while gameMap[coords[1]][coords[0]] != B:
+        coords = randomGeneration(gameMap)
+    Ryo.coord = coords
+    placeInMap(gameMap, Ryo)
+    # resetMap(gameMap, Ryo)
+
+    for item in friendlies:
+        coords = randomGeneration(gameMap)
+        while gameMap[coords[1]][coords[0]] != B:
+            coords = randomGeneration(gameMap)
+        item.coord = coords
+
+        placeInMap(gameMap, item)
+        # resetMap(gameMap, item)
+
+    for item in mobs:
+        coords = randomGeneration(gameMap)
+        while gameMap[coords[1]][coords[0]] != B:
+            coords = randomGeneration(gameMap)
+        item.coord = coords
+
+        placeInMap(gameMap, item)
+        # resetMap(gameMap, item)
+
+    for item in entities:
+        coords = randomGeneration(gameMap)
+        while gameMap[coords[1]][coords[0]] != B:
+            coords = randomGeneration(gameMap)
+        item.coord = coords
+
+        placeInMap(gameMap, item)
+        # resetMap(gameMap, item)
+
+while game:
+    if keyboard.is_pressed("q"): # Detects if you want to exit
+        print(f"time elapsed: {end-start}") # Testing
+        game = False
+    if keyboard.is_pressed("w"): # Example input getting
+        print("w is pressed")
+
+    # Timer
+
+    end = perf_counter()
+    try:
+        time = int(end-start)
+    except:
+        pass
+
+    if time == 1: # 1Hz refresh rate
+        clearscreen() # Clears screen
+        print("1 cycle has passed") # Test print
+        printMap(gameMap, Ryo.money)
+        start = perf_counter()
+        random()
+
+# Initialisation
+
+printMap(gameMap, Ryo.money)
+
+for m in mobs:
+    print(m.symbol)
+for f in friendlies:
+    print(f.symbol)
+for e in entities:
+    print(e.symbol)
+print(Ryo.symbol)
