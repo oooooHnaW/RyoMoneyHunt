@@ -12,7 +12,7 @@ coordPlaceHolder = [0,0]
 
 W = "x" # Wall
 B = " " # Blank space
-RESETTEXT = "\033[0m\033"
+RESETTEXT = "\001\033[0m\002"
 
 WIDTH = 19
 HEIGHT = 19
@@ -45,11 +45,11 @@ gameMap = [[W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
 
 Ryo = player("Ryo", 0, coordPlaceHolder)
 
-mobs = [mob("Nijika", -Ryo.money, "WHY DO YOU KEEP BORROWING MONEY FROM BOCCHI???", coordPlaceHolder, "\033[1m\033 \033[33mN\033"+RESETTEXT), # Ryo.money is a placeholder that means take all of Ryo's money away :)
-        mob("Hiroi", -10, "heh heh, can I please borrow 10 dollars?", coordPlaceHolder, "\033[1m\033 \033[38;2;153;0;153mH\033"+RESETTEXT)]
+mobs = [mob("Nijika", -Ryo.money, "WHY DO YOU KEEP BORROWING MONEY FROM BOCCHI???", coordPlaceHolder, "\001\033[1m\002\001\033[33m\002N"+RESETTEXT), # Ryo.money is a placeholder that means take all of Ryo's money away :)
+        mob("Hiroi", -10, "heh heh, can I please borrow 10 dollars?", coordPlaceHolder, "\001\033[1m\001\033[38;2;153;0;153m\002H"+RESETTEXT)]
 
-friendlies = [friendly("Bocchi", 10, "Ummmm, I guess it's fine if I borrow you 10 dollars?", coordPlaceHolder, "\033[1m\033 \033[38;2;255;0;255mB\033"+RESETTEXT),
-              friendly("Kita", 20, "OF COURSE!!! I'LL DO ANYTHING FOR RYO-SENPAI!!!", coordPlaceHolder, "\033[1m\033 \033[31mK\033"+RESETTEXT)]
+friendlies = [friendly("Bocchi", 10, "Ummmm, I guess it's fine if I borrow you 10 dollars?", coordPlaceHolder, "\001\033[1m\002\001\033[38;2;255;0;255m\002B"+RESETTEXT),
+              friendly("Kita", 20, "OF COURSE!!! I'LL DO ANYTHING FOR RYO-SENPAI!!!", coordPlaceHolder, "\001\033[1m\002\001\033[31m\002K"+RESETTEXT)]
 # Coordinates of entities are currently occupied by coordinate placeholders, will implement random selection of coordinates later on.
 
 entities = [coin(".", 1, 60)] # Time in seconds
@@ -64,7 +64,7 @@ def ms_sleep(ms):
 
 def placeInMap(map, item):
     Coord = item.coord
-    map[Coord[1]][Coord[0]] = item
+    map[Coord[1]][Coord[0]] = item.symbol
 
 def printMap(map, coins):
     for row in map:
@@ -131,12 +131,16 @@ def random(): # Test function
         placeInMap(gameMap, item)
         # resetMap(gameMap, item)
 
+random()
+
 while game:
     if keyboard.is_pressed("q"): # Detects if you want to exit
         print(f"time elapsed: {end-start}") # Testing
         game = False
     if keyboard.is_pressed("w"): # Example input getting
-        print("w is pressed")
+        Ryo.coord[0] += 1
+        if Ryo.coord[0] >= len(gameMap):
+            Ryo.coord[0] = 0
 
     # Timer
 
@@ -147,11 +151,13 @@ while game:
         pass
 
     if time == 1: # 1Hz refresh rate
+        placeInMap(gameMap, Ryo)
         clearscreen() # Clears screen
         print("1 cycle has passed") # Test print
         printMap(gameMap, Ryo.money)
+        print(len(Ryo.symbol))
+        print("Hello\033[1m\033[38;2;255;0;255mB"+RESETTEXT+"Hello")
         start = perf_counter()
-        random()
 
 # Initialisation
 

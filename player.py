@@ -1,4 +1,4 @@
-RESETTEXT = "\033[0m\033"
+RESETTEXT = "\001\033[0m\002"
 
 class player:
     def __init__(self, name, money, coord):
@@ -6,7 +6,7 @@ class player:
         self.money = money
         self.direction = 0 # 0=up, 1=right, 2=down, 3=left
         self.coord = coord
-        self.symbol = "\033[1m\033 \033[34mR\033"+RESETTEXT # First part is ANSI escape code for bold and second part is ANSI escape code for colours and finally the character "R"
+        self.symbol = "\001\033[1m\002\001\033[34m\002R"+RESETTEXT # First part is ANSI escape code for bold and second part is ANSI escape code for colours and finally the character "R"
     
     def movement(self, speed):
         if self.direction == 0:
