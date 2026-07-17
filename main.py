@@ -88,7 +88,7 @@ def resetMap(map, item):
     coords = item.coord
     for row in range(len(map)-1):
         for element in range(len(map[0])-1):
-            if element != coords[0] and row != coords[1] and map[row][element] != W:
+            if element != coords[0] and row != coords[1] and map[row][element] == item.symbol:
                 map[row][element] = B
 
 # Main game
@@ -133,14 +133,37 @@ def random(): # Test function
 
 random()
 
+KeyPress = False
+
 while game:
-    if keyboard.is_pressed("q"): # Detects if you want to exit
-        print(f"time elapsed: {end-start}") # Testing
-        game = False
-    if keyboard.is_pressed("w"): # Example input getting
-        Ryo.coord[0] += 1
-        if Ryo.coord[0] >= len(gameMap):
-            Ryo.coord[0] = 0
+    if KeyPress == False:
+        if keyboard.is_pressed("q"): # Detects if you want to exit
+            print(f"time elapsed: {end-start}") # Testing
+            game = False
+            KeyPress = True
+
+        if keyboard.is_pressed("w"): # Movement
+            Ryo.coord[1] -= 1
+            KeyPress = True
+            if Ryo.coord[1] <= 0:
+                Ryo.coord[1] = len(gameMap)-2
+        elif keyboard.is_pressed("s"):
+            Ryo.coord[1] += 1
+            KeyPress = True
+            if Ryo.coord[1] >= len(gameMap)-1:
+                Ryo.coord[1] = 1
+        
+        # Currently - if it ain't broke, don't fix it. Will have to make it so it can detect the width of the map as well later on.
+        elif keyboard.is_pressed("a"):
+            Ryo.coord[0] -= 1
+            KeyPress = True
+            if Ryo.coord[0]<= 0:
+                Ryo.coord[0] = len(gameMap)-2
+        elif keyboard.is_pressed("d"):
+            Ryo.coord[0] += 1
+            KeyPress = True
+            if Ryo.coord[0] >= len(gameMap)-1:
+                Ryo.coord[0] = 1
 
     # Timer
 
@@ -151,12 +174,11 @@ while game:
         pass
 
     if time == 1: # 1Hz refresh rate
+        KeyPress = False
         placeInMap(gameMap, Ryo)
+        resetMap(gameMap, Ryo)
         clearscreen() # Clears screen
-        print("1 cycle has passed") # Test print
         printMap(gameMap, Ryo.money)
-        print(len(Ryo.symbol))
-        print("Hello\033[1m\033[38;2;255;0;255mB"+RESETTEXT+"Hello")
         start = perf_counter()
 
 # Initialisation
