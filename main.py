@@ -52,7 +52,7 @@ friendlies = [friendly("Bocchi", 10, "Ummmm, I guess it's fine if I borrow you 1
               friendly("Kita", 20, "OF COURSE!!! I'LL DO ANYTHING FOR RYO-SENPAI!!!", coordPlaceHolder, "\001\033[1m\002\001\033[31m\002K"+RESETTEXT)]
 # Coordinates of entities are currently occupied by coordinate placeholders, will implement random selection of coordinates later on.
 
-entities = [coin(".", 1, 60)] # Time in seconds
+entities = [coin(".", 1, 60, coordPlaceHolder)] # Time in seconds
 
 # System/Game procedures
 
@@ -174,6 +174,14 @@ while game:
         pass
 
     if time == 1: # 1Hz refresh rate
+        # Check collisions
+        for entity in mobs:
+            Ryo.checkCollision(entity)
+        for entity in friendlies:
+            Ryo.checkCollision(entity)
+        for entity in entities:
+            Ryo.checkCollision(entity)
+            
         KeyPress = False
         placeInMap(gameMap, Ryo)
         resetMap(gameMap, Ryo)

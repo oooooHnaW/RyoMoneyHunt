@@ -3,7 +3,7 @@ from random import randint
 class mob:
     def __init__(self, name, money_taken, msg, coord, symbol):
         self.name = name
-        self.money_taken = money_taken
+        self.moneyChanged = money_taken
         self.msg = msg
         self.direction = 0 # 0=up, 1=right, 2=down, 3=left
         self.coord = coord
@@ -15,7 +15,7 @@ class mob:
 class friendly:
     def __init__(self, name, add_money, msg, coord, symbol):
         self.name = name
-        self.add_money = add_money
+        self.moneyChanged = add_money
         self.msg = msg
         self.direction = 0 # 0=up, 1=right, 2=down, 3=left
         self.coord = coord

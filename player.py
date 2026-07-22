@@ -20,3 +20,11 @@ class player:
 
         # Here, movement follows pygame coordinate conventions
         # Speed can be defined as movement per tick, tick should be limited to 60fps so speed pixels per tick basically.
+    
+    def checkCollision(self, entity):
+        coords = entity.coord
+        if self.coord == coords:
+            if entity.name == "Nijika":
+                self.money = 0
+            else:
+                self.money += entity.moneyChanged
