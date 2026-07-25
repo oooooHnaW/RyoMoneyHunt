@@ -84,11 +84,11 @@ def randomGeneration(map):
     x = randint(0, len(map[0])-1)
     return [x, y]
 
-def resetMap(map, item):
-    coords = item.coord
+def resetMap(map):
+    coords = Ryo.coord
     for row in range(len(map)-1):
         for element in range(len(map[0])-1):
-            if element != coords[0] and row != coords[1] and map[row][element] == item.symbol:
+            if element != coords[0] and row != coords[1] and map[row][element] == Ryo.symbol:
                 map[row][element] = B
 
 # Main game
@@ -96,49 +96,42 @@ game = True
 
 start = perf_counter()
 
-def random(): # Test function
+def randomChecker(): # Test function
     coords = randomGeneration(gameMap)
     while gameMap[coords[1]][coords[0]] != B:
         coords = randomGeneration(gameMap)
-    Ryo.coord = coords
+
+    return coords
+
+def itemDisplay():
     placeInMap(gameMap, Ryo)
-    # resetMap(gameMap, Ryo)
-
     for item in friendlies:
-        coords = randomGeneration(gameMap)
-        while gameMap[coords[1]][coords[0]] != B:
-            coords = randomGeneration(gameMap)
-        item.coord = coords
-
         placeInMap(gameMap, item)
-        # resetMap(gameMap, item)
 
     for item in mobs:
-        coords = randomGeneration(gameMap)
-        while gameMap[coords[1]][coords[0]] != B:
-            coords = randomGeneration(gameMap)
-        item.coord = coords
-
         placeInMap(gameMap, item)
-        # resetMap(gameMap, item)
 
     for item in entities:
-        coords = randomGeneration(gameMap)
-        while gameMap[coords[1]][coords[0]] != B:
-            coords = randomGeneration(gameMap)
-        item.coord = coords
-
         placeInMap(gameMap, item)
-        # resetMap(gameMap, item)
 
-random()
+Ryo.coord = randomChecker()
+for item in friendlies:
+    item.coord = randomChecker()
+for item in mobs:
+    item.coord = randomChecker()
+for item in entities:
+    item.coord = randomChecker()
+
+itemDisplay()
 
 KeyPress = False
+
+printMsg = ""
 
 while game:
     if KeyPress == False:
         if keyboard.is_pressed("q"): # Detects if you want to exit
-            print(f"time elapsed: {end-start}") # Testing
+            # print(f"time elapsed: {end-start}") # Testing
             game = False
             KeyPress = True
 
@@ -158,11 +151,11 @@ while game:
             Ryo.coord[0] -= 1
             KeyPress = True
             if Ryo.coord[0]<= 0:
-                Ryo.coord[0] = len(gameMap)-2
+                Ryo.coord[0] = len(gameMap[0])-2
         elif keyboard.is_pressed("d"):
             Ryo.coord[0] += 1
             KeyPress = True
-            if Ryo.coord[0] >= len(gameMap)-1:
+            if Ryo.coord[0] >= len(gameMap[0])-1:
                 Ryo.coord[0] = 1
 
     # Timer
@@ -174,29 +167,28 @@ while game:
         pass
 
     if time == 1: # 1Hz refresh rate
+
         # Check collisions
         for entity in mobs:
-            Ryo.checkCollision(entity)
+            if Ryo.checkCollision(entity):
+                entity.coord = randomChecker()
+                printMsg = entity.msg
         for entity in friendlies:
-            Ryo.checkCollision(entity)
+            if Ryo.checkCollision(entity):
+                entity.coord = randomChecker()
+                printMsg = entity.msg
         for entity in entities:
-            Ryo.checkCollision(entity)
+            if Ryo.checkCollision(entity):
+                entity.coord = randomChecker()
             
         KeyPress = False
-        placeInMap(gameMap, Ryo)
-        resetMap(gameMap, Ryo)
+        itemDisplay()
+        resetMap(gameMap)
         clearscreen() # Clears screen
         printMap(gameMap, Ryo.money)
+        print(printMsg)
         start = perf_counter()
 
 # Initialisation
 
-printMap(gameMap, Ryo.money)
-
-for m in mobs:
-    print(m.symbol)
-for f in friendlies:
-    print(f.symbol)
-for e in entities:
-    print(e.symbol)
-print(Ryo.symbol)
+# printMap(gameMap, Ryo.money)

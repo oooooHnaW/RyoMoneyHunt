@@ -28,3 +28,7 @@ class player:
                 self.money = 0
             else:
                 self.money += entity.moneyChanged
+
+            return True
+        else:
+            return False
