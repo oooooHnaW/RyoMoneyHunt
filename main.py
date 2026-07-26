@@ -45,7 +45,7 @@ gameMap = [[W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W,W],
 
 Ryo = player("Ryo", 0, coordPlaceHolder)
 
-mobs = [mob("Nijika", -Ryo.money, "WHY DO YOU KEEP BORROWING MONEY FROM BOCCHI???", coordPlaceHolder, "\001\033[1m\002\001\033[33m\002N"+RESETTEXT), # Ryo.money is a placeholder that means take all of Ryo's money away :)
+mobs = [mob("Nijika", -Ryo.money, "WHY DO YOU KEEP BORROWING MONEY FROM YOUR FRIENDS???", coordPlaceHolder, "\001\033[1m\002\001\033[33m\002N"+RESETTEXT), # Ryo.money is a placeholder that means take all of Ryo's money away :)
         mob("Hiroi", -10, "heh heh, can I please borrow 10 dollars?", coordPlaceHolder, "\001\033[1m\001\033[38;2;153;0;153m\002H"+RESETTEXT)]
 
 friendlies = [friendly("Bocchi", 10, "Ummmm, I guess it's fine if I borrow you 10 dollars?", coordPlaceHolder, "\001\033[1m\002\001\033[38;2;255;0;255m\002B"+RESETTEXT),
@@ -76,6 +76,32 @@ def printMap(map, coins):
         print()
     
     print(f"Money:${coins}")
+
+def collideDetect(gameMap, entity, direction):
+    coords = entity.coord
+    if direction == "w":
+        if gameMap[coords[1]-1][coords[0]] == W:
+            pass
+        else:
+            entity.coord[1] -= 1
+
+    elif direction == "a":
+        if gameMap[coords[1]][coords[0]-1] == W:
+            pass
+        else:
+            entity.coord[0] -= 1
+
+    elif direction == "s":
+        if gameMap[coords[1]+1][coords[0]] == W:
+            pass
+        else:
+            entity.coord[1] += 1
+
+    elif direction == "d":
+        if gameMap[coords[1]][coords[0]+1] == W:
+            pass
+        else:
+            entity.coord[0] += 1
 
 def randomGeneration(map):
     y = 0
@@ -136,27 +162,21 @@ while game:
             KeyPress = True
 
         if keyboard.is_pressed("w"): # Movement
-            Ryo.coord[1] -= 1
             KeyPress = True
-            if Ryo.coord[1] <= 0:
-                Ryo.coord[1] = len(gameMap)-2
+            collideDetect(gameMap, Ryo, "w")
+
         elif keyboard.is_pressed("s"):
-            Ryo.coord[1] += 1
             KeyPress = True
-            if Ryo.coord[1] >= len(gameMap)-1:
-                Ryo.coord[1] = 1
+            collideDetect(gameMap, Ryo, "s")
         
         # Currently - if it ain't broke, don't fix it. Will have to make it so it can detect the width of the map as well later on.
         elif keyboard.is_pressed("a"):
-            Ryo.coord[0] -= 1
             KeyPress = True
-            if Ryo.coord[0]<= 0:
-                Ryo.coord[0] = len(gameMap[0])-2
+            collideDetect(gameMap, Ryo, "a")
+            
         elif keyboard.is_pressed("d"):
-            Ryo.coord[0] += 1
             KeyPress = True
-            if Ryo.coord[0] >= len(gameMap[0])-1:
-                Ryo.coord[0] = 1
+            collideDetect(gameMap, Ryo, "d")
 
     # Timer
 
