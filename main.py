@@ -114,7 +114,7 @@ def resetMap(map):
     coords = Ryo.coord
     for row in range(len(map)-1):
         for element in range(len(map[0])-1):
-            if element != coords[0] and row != coords[1] and map[row][element] == Ryo.symbol:
+            if (element != coords[0] or row != coords[1]) and map[row][element] == Ryo.symbol:
                 map[row][element] = B
 
 # Main game
